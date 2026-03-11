@@ -72,7 +72,7 @@ export function ProblemList() {
             value={difficultyFilter}
             options={['All', 'Easy', 'Medium', 'Hard'] as const}
             onChange={(value) => {
-              setDifficultyFilter(value)
+              setDifficultyFilter(value as DifficultyFilter)
               setCurrentPage(1)
             }}
           />
@@ -196,27 +196,49 @@ function FilterSelect({
   label: string
   value: string
   options: readonly string[]
-  onChange: (value: any) => void
+  onChange: (value: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="relative">
       <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsOpen(!isOpen)
+          }
+        }}
         className="flex items-center gap-2 px-3 py-2 rounded-md bg-card border border-border text-sm text-foreground hover:bg-card/80 transition-colors"
       >
         {label}: {value}
         <ChevronDown className="w-4 h-4" />
       </button>
       {isOpen && (
-        <div className="absolute top-full mt-2 left-0 w-full bg-card border border-border rounded-md shadow-lg z-10">
+        <div 
+          role="listbox" 
+          className="absolute top-full mt-2 left-0 w-full bg-card border border-border rounded-md shadow-lg z-10"
+        >
           {options.map((option) => (
             <button
+              type="button"
+              role="option"
+              aria-selected={value === option}
               key={option}
               onClick={() => {
                 onChange(option)
                 setIsOpen(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onChange(option)
+                  setIsOpen(false)
+                }
               }}
               className={`w-full px-3 py-2 text-left text-sm hover:bg-card/80 transition-colors ${
                 value === option ? 'text-accent font-medium' : 'text-muted-foreground'

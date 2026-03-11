@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import Editor from '@monaco-editor/react'
 
 interface CodeEditorProps {
   language: string
@@ -8,7 +8,15 @@ interface CodeEditorProps {
   onChange: (code: string) => void
 }
 
-const codeTemplates = {
+const languageMap: Record<string, string> = {
+  python: 'python',
+  javascript: 'javascript',
+  java: 'java',
+  cpp: 'cpp',
+  golang: 'go',
+}
+
+const codeTemplates: Record<string, string> = {
   python: `def twoSum(nums, target):
     """
     :type nums: List[int]
@@ -82,26 +90,30 @@ public:
 }
 
 export function CodeEditor({ language, code, onChange }: CodeEditorProps) {
-  const [internalCode, setInternalCode] = useState(code)
-
-  useEffect(() => {
-    setInternalCode(codeTemplates[language as keyof typeof codeTemplates] || '')
-  }, [language])
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newCode = e.target.value
-    setInternalCode(newCode)
-    onChange(newCode)
-  }
+  const monacoLanguage = languageMap[language] || 'plaintext'
+  const template = codeTemplates[language] || ''
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <textarea
-        value={internalCode}
-        onChange={handleChange}
-        className="flex-1 w-full p-4 font-mono text-sm bg-background text-foreground border-none outline-none resize-none"
-        placeholder="Write your code here..."
-        spellCheck="false"
+    <div className="w-full h-full">
+      <Editor
+        height="100%"
+        language={monacoLanguage}
+        value={code || template}
+        onChange={(value) => onChange(value || '')}
+        theme="vs-dark"
+        options={{
+          fontSize: 14,
+          fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          lineNumbers: 'on',
+          renderLineHighlight: 'line',
+          cursorBlinking: 'smooth',
+          cursorSmoothCaretAnimation: 'on',
+          smoothScrolling: true,
+          padding: { top: 16, bottom: 16 },
+          automaticLayout: true,
+        }}
       />
     </div>
   )

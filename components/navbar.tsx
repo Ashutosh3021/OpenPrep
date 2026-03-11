@@ -38,11 +38,11 @@ export function Navbar({ showAuth = true }: NavbarProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
-          <Link href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-80">
+          <Link href="/problems" className="flex items-center gap-2 group transition-opacity hover:opacity-80">
             <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
               <span className="text-foreground font-bold text-lg">O</span>
             </div>
@@ -51,9 +51,8 @@ export function Navbar({ showAuth = true }: NavbarProps) {
 
           {/* Center Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            <NavLink href="/" label="Problems" active={pathname === '/'} />
+            <NavLink href="/problems" label="Problems" active={pathname === '/problems'} />
             <NavLink href="/daily" label="Daily Challenge" active={pathname === '/daily'} />
-            <NavLink href="/discuss" label="Discuss" active={pathname === '/discuss'} />
           </div>
 
           {/* Right Side - Streak + Auth */}

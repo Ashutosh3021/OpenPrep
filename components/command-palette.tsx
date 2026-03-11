@@ -67,7 +67,7 @@ export function CommandPalette() {
                   key={category}
                   value={category}
                   onSelect={() => {
-                    router.push(`/?category=${category}`)
+                    router.push(`/problems?category=${category}`)
                     setOpen(false)
                   }}
                   className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-card hover:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 focus:bg-accent focus:text-accent-foreground"
@@ -92,7 +92,7 @@ export function CommandPalette() {
               <Command.Item
                 value="Go to Problems"
                 onSelect={() => {
-                  router.push('/')
+                  router.push('/problems')
                   setOpen(false)
                 }}
                 className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-card hover:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 focus:bg-accent focus:text-accent-foreground"

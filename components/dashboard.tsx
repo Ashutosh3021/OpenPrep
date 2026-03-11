@@ -255,10 +255,10 @@ function ActivityHeatmap() {
     <div className="overflow-x-auto">
       <div className="flex gap-1">
         {weeks.slice(-26).map((week, weekIdx) => (
-          <div key={weekIdx} className="flex flex-col gap-1">
+          <div key={`week-${weekIdx}`} className="flex flex-col gap-1">
             {week.map((day, dayIdx) => (
               <div
-                key={dayIdx}
+                key={`${day.date.toISOString()}`}
                 className={`w-3 h-3 rounded-sm ${getColor(day.count)} cursor-pointer hover:ring-2 hover:ring-foreground transition-all`}
                 title={`${day.date.toDateString()}: ${day.count} submissions`}
               />
@@ -271,7 +271,7 @@ function ActivityHeatmap() {
         <div className="flex gap-1">
           {[0, 1, 2, 3, 4].map(i => (
             <div
-              key={i}
+              key={`legend-${i}`}
               className={`w-3 h-3 rounded-sm ${getColor(i)}`}
             />
           ))}

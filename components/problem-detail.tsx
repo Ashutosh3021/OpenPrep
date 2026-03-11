@@ -31,7 +31,7 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
       {/* Header */}
       <div className="border-b border-border bg-card/50 px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto">
-          <Link href="/" className="text-sm text-accent hover:underline mb-4 inline-block">
+          <Link href="/problems" className="text-sm text-accent hover:underline mb-4 inline-block">
             ← Back to Problems
           </Link>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

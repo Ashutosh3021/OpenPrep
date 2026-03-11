@@ -1,7 +1,12 @@
 import { Navbar } from '@/components/navbar'
 import { ProblemList } from '@/components/problem-list'
 
-export default function Home() {
+export const metadata = {
+  title: 'Problems - OpenPrep',
+  description: 'Browse and solve coding problems',
+}
+
+export default function ProblemsPage() {
   return (
     <>
       <Navbar />
