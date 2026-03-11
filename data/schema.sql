@@ -127,6 +127,8 @@ CREATE POLICY "Users can update own activity"
 
 -- ============================================
 -- METRICS VIEW (for dashboard)
+-- Note: difficulty breakdown requires problems table (Phase 2)
+-- This basic view works without problems table
 -- ============================================
 
 CREATE OR REPLACE VIEW user_stats AS
@@ -134,15 +136,9 @@ SELECT
     p.id as user_id,
     p.username,
     COUNT(s.id) FILTER (WHERE s.status = 'Accepted') as total_solved,
-    COUNT(s.id) FILTER (WHERE s.status = 'Accepted' AND (
-        SELECT difficulty FROM problems WHERE id = s.problem_id
-    ) = 'Easy') as easy_solved,
-    COUNT(s.id) FILTER (WHERE s.status = 'Accepted' AND (
-        SELECT difficulty FROM problems WHERE id = s.problem_id
-    ) = 'Medium') as medium_solved,
-    COUNT(s.id) FILTER (WHERE s.status = 'Accepted' AND (
-        SELECT difficulty FROM problems WHERE id = s.problem_id
-    ) = 'Hard') as hard_solved,
+    0 as easy_solved,
+    0 as medium_solved,
+    0 as hard_solved,
     COUNT(s.id) as total_submissions,
     ROUND(
         COUNT(s.id) FILTER (WHERE s.status = 'Accepted')::numeric / 
