@@ -4,10 +4,19 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Command } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface NavbarProps {
   showAuth?: boolean
+}
+
+interface User {
+  id: string
+  email?: string
+  user_metadata?: {
+    username?: string
+    avatar_url?: string
+  }
 }
 
 export function Navbar({ showAuth = true }: NavbarProps) {
@@ -15,20 +24,35 @@ export function Navbar({ showAuth = true }: NavbarProps) {
   const pathname = usePathname()
   const [streak, setStreak] = useState(7)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userEmail, setUserEmail] = useState('')
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (user) {
-      const userData = JSON.parse(user)
-      setIsAuthenticated(true)
-      setUserEmail(userData.email)
-    }
+    // Check current session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setIsAuthenticated(true)
+        setUser(user as User)
+      }
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setIsAuthenticated(true)
+        setUser(session.user as User)
+      } else {
+        setIsAuthenticated(false)
+        setUser(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem('user')
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
     setIsAuthenticated(false)
+    setUser(null)
     router.push('/login')
   }
 
@@ -73,7 +97,7 @@ export function Navbar({ showAuth = true }: NavbarProps) {
                   className="hidden sm:inline-flex text-muted-foreground hover:text-foreground"
                   onClick={() => router.push('/dashboard')}
                 >
-                  Profile
+                  {user?.user_metadata?.username || user?.email?.split('@')[0] || 'Profile'}
                 </Button>
                 <Button
                   variant="ghost"

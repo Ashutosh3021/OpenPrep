@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { supabase } from '@/lib/supabase'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -35,17 +36,37 @@ export default function SignupPage() {
         return
       }
 
-      // Mock registration
-      localStorage.setItem('user', JSON.stringify({ 
-        email, 
-        id: Math.random(),
-        createdAt: new Date().toISOString()
-      }))
-      router.push('/dashboard')
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: email.split('@')[0],
+          },
+        },
+      })
+
+      if (error) {
+        setError(error.message)
+      } else {
+        router.push('/problems')
+      }
     } catch (err) {
       setError('Failed to sign up')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGitHubSignup = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+    if (error) {
+      setError(error.message)
     }
   }
 
@@ -129,7 +150,7 @@ export default function SignupPage() {
           <Button
             type="button"
             className="w-full bg-card border border-border text-foreground hover:bg-card/80"
-            onClick={() => alert('GitHub OAuth would be configured here')}
+            onClick={handleGitHubSignup}
           >
             Sign Up with GitHub
           </Button>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -19,18 +20,32 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // Mock authentication - in production this would call your auth API
-      if (email && password) {
-        // Store mock user data
-        localStorage.setItem('user', JSON.stringify({ email, id: Math.random() }))
-        router.push('/dashboard')
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        setError(error.message)
       } else {
-        setError('Please fill in all fields')
+        router.push('/problems')
       }
     } catch (err) {
       setError('Failed to login')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGitHubLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+    if (error) {
+      setError(error.message)
     }
   }
 
@@ -99,7 +114,7 @@ export default function LoginPage() {
           <Button
             type="button"
             className="w-full bg-card border border-border text-foreground hover:bg-card/80"
-            onClick={() => alert('GitHub OAuth would be configured here')}
+            onClick={handleGitHubLogin}
           >
             Continue with GitHub
           </Button>
@@ -107,7 +122,7 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/signup" className="text-accent hover:underline font-medium">
                 Sign up
               </Link>
