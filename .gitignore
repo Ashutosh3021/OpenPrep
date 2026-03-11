@@ -5,6 +5,7 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
+.env
 
 # v0 runtime files
 __v0_runtime_loader.js
