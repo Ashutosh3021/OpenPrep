@@ -5,11 +5,44 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { mockProblems } from '@/lib/mock-data'
 import { CodeEditor } from '@/components/code-editor'
+import { MarkdownRenderer } from '@/components/markdown-renderer'
+import { TestCaseList } from '@/components/test-case-list'
 import { ThumbsUp, Share2, Flag } from 'lucide-react'
 
 interface ProblemDetailProps {
   problemId: number
 }
+
+// Mock markdown description for problems
+const mockDescription = `
+Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to the target.
+
+You may assume that each input would have **exactly one solution**, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+## Example 1:
+
+\`\`\`
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+\`\`\`
+
+## Example 2:
+
+\`\`\`
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+\`\`\`
+
+## Constraints:
+
+- \`2 <= nums.length <= 10^4\`
+- \`-10^9 <= nums[i] <= 10^9\`
+- \`-10^9 <= target <= 10^9\`
+- Only one valid answer exists.
+`
 
 export function ProblemDetail({ problemId }: ProblemDetailProps) {
   const problem = mockProblems.find(p => p.id === problemId)
@@ -25,6 +58,13 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
   }
 
   const languages = ['python', 'javascript', 'java', 'cpp', 'golang']
+
+  // Mock test cases for demonstration
+  const mockTestCases = [
+    { id: '1', input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
+    { id: '2', input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
+    { id: '3', input: 'nums = [3,3], target = 6', output: '[0,1]' }
+  ]
 
   return (
     <div className="h-screen flex flex-col">
@@ -83,47 +123,15 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
             {/* Description */}
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-foreground">Description</h2>
-              <div className="space-y-3 text-muted-foreground leading-relaxed">
-                <p>
-                  Given an array of integers <code className="bg-card px-2 py-1 rounded font-mono text-sm">nums</code> and an integer <code className="bg-card px-2 py-1 rounded font-mono text-sm">target</code>, return the indices of the two numbers that add up to the target.
-                </p>
-                <p>
-                  You may assume that each input has exactly one solution, and you may not use the same element twice.
-                </p>
-                <p>You can return the answer in any order.</p>
+              <div className="text-muted-foreground leading-relaxed">
+                <MarkdownRenderer content={mockDescription} />
               </div>
             </div>
 
             {/* Examples */}
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-foreground">Examples</h2>
-              <div className="space-y-4">
-                <div className="bg-card border border-border rounded p-3 space-y-2">
-                  <p className="text-sm font-medium text-foreground">Example 1:</p>
-                  <pre className="text-xs bg-background p-2 rounded font-mono text-foreground overflow-x-auto">
-{`Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Explanation: nums[0] + nums[1] == 9, we return [0, 1].`}
-                  </pre>
-                </div>
-                <div className="bg-card border border-border rounded p-3 space-y-2">
-                  <p className="text-sm font-medium text-foreground">Example 2:</p>
-                  <pre className="text-xs bg-background p-2 rounded font-mono text-foreground overflow-x-auto">
-{`Input: nums = [3,2,4], target = 6
-Output: [1,2]`}
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/* Constraints */}
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-foreground">Constraints</h2>
-              <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-                <li>2 ≤ nums.length ≤ 10^4</li>
-                <li>-10^9 ≤ nums[i] ≤ 10^9</li>
-                <li>-10^9 ≤ target ≤ 10^9</li>
-              </ul>
+              <TestCaseList testCases={mockTestCases} />
             </div>
           </div>
         </div>
