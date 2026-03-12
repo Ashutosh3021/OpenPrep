@@ -63,7 +63,7 @@
 **Plans:** 3 plans
 
 - [x] 02-01-PLAN.md — Install dependencies and create core UI components (Complete)
-- [ ] 02-02-PLAN.md — Create company sidebar and integrate with problems page
+- [x] 02-02-PLAN.md — Create company sidebar and integrate with problems page (Complete)
 - [ ] 02-03-PLAN.md — Update problem detail with markdown and test cases
 
 ---
@@ -136,7 +136,7 @@
 | Phase | Requirements | Status |
 |-------|--------------|--------|
 | 1 - Setup & Auth | 5 | Complete |
-| 2 - Problems & Companies | 10 | In Progress (1/3 plans) |
+| 2 - Problems & Companies | 10 | In Progress (2/3 plans) |
 | 3 - Code Execution | 7 | Not started |
 | 4 - Dashboard & Daily | 7 | Not started |
 | 5 - Developer Features | 4 | Not started |
