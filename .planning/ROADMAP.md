@@ -8,8 +8,8 @@
 
 ## Phases
 
-- [ ] **Phase 1: Setup & Authentication** - Project scaffolding, database, auth system
-- [ ] **Phase 2: Problems & Companies** - Problem listing, filtering, descriptions
+- [x] **Phase 1: Setup & Authentication** - Project scaffolding, database, auth system
+- [x] **Phase 2: Problems & Companies** - Problem listing, filtering, descriptions
 - [ ] **Phase 3: Code Execution** - Monaco editor, Judge0 integration, submissions
 - [ ] **Phase 4: Dashboard & Daily** - Progress tracking, heatmaps, daily challenge
 - [ ] **Phase 5: Developer Features** - Command palette, shortcuts, export
@@ -34,7 +34,9 @@
 4. User can log out from any page
 5. User profile is created automatically on signup
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+- [x] 01-01-PLAN.md — Set up Supabase authentication with email/password and GitHub OAuth
 
 ---
 
@@ -58,7 +60,11 @@
 8. User can filter by recency period (30d/3mo/6mo/6mo+)
 9. User can see frequency score for company-problem combination
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+- [x] 02-01-PLAN.md — Install dependencies and create core UI components (Complete)
+- [ ] 02-02-PLAN.md — Create company sidebar and integrate with problems page
+- [ ] 02-03-PLAN.md — Update problem detail with markdown and test cases
 
 ---
 
@@ -129,8 +135,8 @@
 
 | Phase | Requirements | Status |
 |-------|--------------|--------|
-| 1 - Setup & Auth | 5 | Not started |
-| 2 - Problems & Companies | 10 | Not started |
+| 1 - Setup & Auth | 5 | Complete |
+| 2 - Problems & Companies | 10 | In Progress (1/3 plans) |
 | 3 - Code Execution | 7 | Not started |
 | 4 - Dashboard & Daily | 7 | Not started |
 | 5 - Developer Features | 4 | Not started |
