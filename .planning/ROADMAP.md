@@ -60,7 +60,7 @@
 8. User can filter by recency period (30d/3mo/6mo/6mo+)
 9. User can see frequency score for company-problem combination
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 - [x] 02-01-PLAN.md — Install dependencies and create core UI components (Complete)
 - [x] 02-02-PLAN.md — Create company sidebar and integrate with problems page (Complete)
@@ -136,8 +136,7 @@
 | Phase | Requirements | Status |
 |-------|--------------|--------|
 | 1 - Setup & Auth | 5 | Complete |
-| 2 - Problems & Companies | 10 | Complete (3/3 plans) |
-| 3 - Code Execution | 7 | Not started |
+| 2 - Problems & Companies | 10 | Complete    | 2026-03-12 | 3 - Code Execution | 7 | Not started |
 | 4 - Dashboard & Daily | 7 | Not started |
 | 5 - Developer Features | 4 | Not started |
 
