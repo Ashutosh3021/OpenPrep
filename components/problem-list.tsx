@@ -6,34 +6,110 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { mockProblems, type Problem } from '@/lib/mock-data'
 import { Check, Search, ChevronDown } from 'lucide-react'
+import { FrequencyBadge } from './frequency-badge'
 
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard'
 type CategoryFilter = string
 
-export function ProblemList() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All')
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All')
+interface FilterState {
+  searchQuery: string
+  difficulty: string
+  category: string
+}
+
+interface ProblemListProps {
+  problems?: Problem[]
+  isLoading?: boolean
+  filters?: FilterState
+  onSearchChange?: (query: string) => void
+  onDifficultyChange?: (difficulty: string) => void
+  onCategoryChange?: (category: string) => void
+}
+
+export function ProblemList({
+  problems: externalProblems,
+  isLoading = false,
+  filters: externalFilters,
+  onSearchChange: externalOnSearchChange,
+  onDifficultyChange: externalOnDifficultyChange,
+  onCategoryChange: externalOnCategoryChange,
+}: ProblemListProps) {
+  // Internal state (used if no external props provided)
+  const [internalSearchQuery, setInternalSearchQuery] = useState('')
+  const [internalDifficultyFilter, setInternalDifficultyFilter] = useState<DifficultyFilter>('All')
+  const [internalCategoryFilter, setInternalCategoryFilter] = useState<CategoryFilter>('All')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  // Extract unique categories
+  // Use external filters if provided, otherwise internal
+  const searchQuery = externalFilters?.searchQuery ?? internalSearchQuery
+  const difficultyFilter = (externalFilters?.difficulty as DifficultyFilter) ?? internalDifficultyFilter
+  const categoryFilter = externalFilters?.category ?? internalCategoryFilter
+
+  // Handlers - use external if provided, otherwise internal
+  const handleSearchChange = (query: string) => {
+    if (externalOnSearchChange) {
+      externalOnSearchChange(query)
+    } else {
+      setInternalSearchQuery(query)
+    }
+    setCurrentPage(1)
+  }
+
+  const handleDifficultyChange = (diff: string) => {
+    if (externalOnDifficultyChange) {
+      externalOnDifficultyChange(diff)
+    } else {
+      setInternalDifficultyFilter(diff as DifficultyFilter)
+    }
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (cat: string) => {
+    if (externalOnCategoryChange) {
+      externalOnCategoryChange(cat)
+    } else {
+      setInternalCategoryFilter(cat)
+    }
+    setCurrentPage(1)
+  }
+
+  // Extract unique categories from all mock problems
   const categories = ['All', ...new Set(mockProblems.map(p => p.category))]
 
-  // Filter problems
+  // Use external problems if provided, otherwise filter mockProblems
   const filteredProblems = useMemo(() => {
-    return mockProblems.filter(problem => {
+    const problemsToFilter = externalProblems || mockProblems
+    
+    return problemsToFilter.filter(problem => {
       const matchesSearch = problem.title.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesDifficulty = difficultyFilter === 'All' || problem.difficulty === difficultyFilter
       const matchesCategory = categoryFilter === 'All' || problem.category === categoryFilter
       return matchesSearch && matchesDifficulty && matchesCategory
     })
-  }, [searchQuery, difficultyFilter, categoryFilter])
+  }, [searchQuery, difficultyFilter, categoryFilter, externalProblems])
 
   // Pagination
   const totalPages = Math.ceil(filteredProblems.length / itemsPerPage)
   const startIdx = (currentPage - 1) * itemsPerPage
   const paginatedProblems = filteredProblems.slice(startIdx, startIdx + itemsPerPage)
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-48 bg-muted rounded-lg" />
+          <div className="h-10 bg-muted rounded w-1/3" />
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-muted rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -57,10 +133,7 @@ export function ProblemList() {
             type="text"
             placeholder="Search problems..."
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setCurrentPage(1)
-            }}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10 bg-input border-border"
           />
         </div>
@@ -71,19 +144,13 @@ export function ProblemList() {
             label="Difficulty"
             value={difficultyFilter}
             options={['All', 'Easy', 'Medium', 'Hard'] as const}
-            onChange={(value) => {
-              setDifficultyFilter(value as DifficultyFilter)
-              setCurrentPage(1)
-            }}
+            onChange={handleDifficultyChange}
           />
           <FilterSelect
             label="Category"
             value={categoryFilter}
             options={categories}
-            onChange={(value) => {
-              setCategoryFilter(value)
-              setCurrentPage(1)
-            }}
+            onChange={handleCategoryChange}
           />
         </div>
       </div>
@@ -103,6 +170,7 @@ export function ProblemList() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">Title</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">Difficulty</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">Category</th>
+                <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-muted-foreground">Frequency</th>
                 <th className="hidden sm:table-cell px-4 py-3 text-right text-xs font-semibold text-muted-foreground">Acceptance</th>
               </tr>
             </thead>
@@ -113,7 +181,7 @@ export function ProblemList() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     No problems found
                   </td>
                 </tr>
@@ -158,6 +226,9 @@ function ProblemRow({ problem }: { problem: Problem }) {
     Hard: 'text-red-500 bg-red-500/10',
   }
 
+  // Get frequency from problem (may not exist in mock data)
+  const frequency = (problem as { frequency?: number }).frequency
+
   return (
     <tr className="border-b border-border hover:bg-card/50 transition-colors">
       <td className="px-4 py-3">
@@ -180,6 +251,9 @@ function ProblemRow({ problem }: { problem: Problem }) {
         </span>
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">{problem.category}</td>
+      <td className="hidden sm:table-cell px-4 py-3">
+        {frequency !== undefined ? <FrequencyBadge frequency={frequency} /> : null}
+      </td>
       <td className="hidden sm:table-cell px-4 py-3 text-right text-sm text-muted-foreground">
         {problem.acceptance.toFixed(1)}%
       </td>
