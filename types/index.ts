@@ -50,3 +50,59 @@ export interface FetchProblemsOptions {
   limit?: number
   offset?: number
 }
+
+// Code execution types for Judge0 integration
+
+export type Language = 'python' | 'javascript' | 'java' | 'cpp' | 'golang'
+
+export interface ExecuteRequest {
+  source: string
+  language: Language
+  stdin?: string
+}
+
+export interface ExecuteResponse {
+  stdout: string
+  stderr: string
+  status: {
+    id: number
+    description: string
+  }
+  time: string
+  memory: number
+}
+
+export interface TestCaseInput {
+  input: string
+  expectedOutput: string
+}
+
+export interface SubmitRequest {
+  source: string
+  language: Language
+  problemId: number
+  testCases: TestCaseInput[]
+}
+
+export interface TestResult {
+  passed: boolean
+  input: string
+  expectedOutput: string
+  actualOutput: string
+  status: {
+    id: number
+    description: string
+  }
+  time: string
+  memory: number
+}
+
+export interface SubmitResponse {
+  status: {
+    id: number
+    description: string
+  }
+  time: string
+  memory: number
+  testResults: TestResult[]
+}
