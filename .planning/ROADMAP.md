@@ -86,7 +86,11 @@
 6. User sees wrong answer details when tests fail
 7. Runtime and memory usage displayed after execution
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+- [ ] 03-01-PLAN.md — Backend API integration with Judge0
+- [ ] 03-02-PLAN.md — Run Code functionality with custom input and output panel
+- [ ] 03-03-PLAN.md — Submit Code functionality with side panel results
 
 ---
 
@@ -136,7 +140,8 @@
 | Phase | Requirements | Status |
 |-------|--------------|--------|
 | 1 - Setup & Auth | 5 | Complete |
-| 2 - Problems & Companies | 10 | Complete    | 2026-03-12 | 3 - Code Execution | 7 | Not started |
+| 2 - Problems & Companies | 10 | Complete |
+| 3 - Code Execution | 7 | Planned |
 | 4 - Dashboard & Daily | 7 | Not started |
 | 5 - Developer Features | 4 | Not started |
 
