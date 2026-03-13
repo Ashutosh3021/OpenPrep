@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, KeyboardEvent } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { mockProblems } from '@/lib/mock-data'
 import { CodeEditor } from '@/components/code-editor'
+import { CodeOutput } from '@/components/code-output'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
 import { TestCaseList } from '@/components/test-case-list'
-import { ThumbsUp, Share2, Flag } from 'lucide-react'
+import { ThumbsUp, Share2, Flag, Play, Loader2 } from 'lucide-react'
+import type { Language, ExecuteResponse } from '@/types'
 
 interface ProblemDetailProps {
   problemId: number
@@ -46,8 +48,11 @@ Output: [1,2]
 
 export function ProblemDetail({ problemId }: ProblemDetailProps) {
   const problem = mockProblems.find(p => p.id === problemId)
-  const [selectedLanguage, setSelectedLanguage] = useState('python')
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('python')
   const [code, setCode] = useState('')
+  const [customInput, setCustomInput] = useState('')
+  const [output, setOutput] = useState<ExecuteResponse | null>(null)
+  const [isRunning, setIsRunning] = useState(false)
 
   if (!problem) {
     return (
@@ -57,7 +62,7 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
     )
   }
 
-  const languages = ['python', 'javascript', 'java', 'cpp', 'golang']
+  const languages: Language[] = ['python', 'javascript', 'java', 'cpp', 'golang']
 
   // Mock test cases for demonstration
   const mockTestCases = [
@@ -65,6 +70,56 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
     { id: '2', input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
     { id: '3', input: 'nums = [3,3], target = 6', output: '[0,1]' }
   ]
+
+  // Handle Run Code button click
+  const handleRunCode = async () => {
+    if (!code.trim()) {
+      return
+    }
+
+    setIsRunning(true)
+    setOutput(null)
+
+    try {
+      const response = await fetch('/api/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source: code,
+          language: selectedLanguage,
+          stdin: customInput,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to execute code')
+      }
+
+      const data: ExecuteResponse = await response.json()
+      setOutput(data)
+    } catch (error) {
+      console.error('Error running code:', error)
+      setOutput({
+        stdout: '',
+        stderr: 'Failed to execute code. Please check your input and try again.',
+        status: { id: 7, description: 'Runtime Error' },
+        time: '0.00',
+        memory: 0,
+      })
+    } finally {
+      setIsRunning(false)
+    }
+  }
+
+  // Handle keyboard shortcut (Ctrl+Enter / Cmd+Enter)
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault()
+      handleRunCode()
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -164,15 +219,59 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Custom Input */}
+          <div className="border-t border-border">
+            <div className="px-4 py-2 text-xs text-muted-foreground font-medium">
+              Custom Input (stdin)
+            </div>
+            <textarea
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Enter custom input for your code..."
+              className="w-full h-20 px-4 py-2 bg-card text-foreground font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+          </div>
+
+          {/* Run and Submit Buttons */}
           <div className="border-t border-border bg-card/50 p-4 flex gap-2">
-            <Button className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
+            <Button 
+              className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+              disabled={isRunning}
+            >
               Submit
             </Button>
-            <Button variant="outline" className="border-border text-foreground hover:bg-card">
-              Run Code
+            <Button 
+              variant="outline" 
+              className="border-border text-foreground hover:bg-card"
+              onClick={handleRunCode}
+              disabled={isRunning || !code.trim()}
+            >
+              {isRunning ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Running...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 mr-2" />
+                  Run Code
+                </>
+              )}
             </Button>
           </div>
+
+          {/* Output Panel */}
+          {(output || isRunning) && (
+            <CodeOutput
+              stdout={output?.stdout || ''}
+              stderr={output?.stderr || ''}
+              time={output?.time || '0.00'}
+              memory={output?.memory || 0}
+              status={output?.status || { id: 3, description: 'Processing' }}
+              isLoading={isRunning}
+            />
+          )}
         </div>
       </div>
     </div>
