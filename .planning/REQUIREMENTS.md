@@ -33,11 +33,11 @@
 
 - [ ] **EXEC-01**: User can write code in Monaco editor
 - [ ] **EXEC-02**: User can switch between supported languages
-- [ ] **EXEC-03**: User can run code with custom input
-- [ ] **EXEC-04**: User can submit code and see test results
-- [ ] **EXEC-05**: User sees Accepted verdict when all tests pass
-- [ ] **EXEC-06**: User sees wrong answer details when tests fail
-- [ ] **EXEC-07**: Runtime and memory usage displayed after execution
+- [x] **EXEC-03**: User can run code with custom input
+- [x] **EXEC-04**: User can submit code and see test results
+- [x] **EXEC-05**: User sees Accepted verdict when all tests pass
+- [x] **EXEC-06**: User sees wrong answer details when tests fail
+- [x] **EXEC-07**: Runtime and memory usage displayed after execution
 
 ### Dashboard
 
@@ -109,11 +109,11 @@
 | COMP-03 | Phase 2 | Pending |
 | EXEC-01 | Phase 3 | Pending |
 | EXEC-02 | Phase 3 | Pending |
-| EXEC-03 | Phase 3 | Pending |
-| EXEC-04 | Phase 3 | Pending |
-| EXEC-05 | Phase 3 | Pending |
-| EXEC-06 | Phase 3 | Pending |
-| EXEC-07 | Phase 3 | Pending |
+| EXEC-03 | Phase 3 | Complete |
+| EXEC-04 | Phase 3 | Complete |
+| EXEC-05 | Phase 3 | Complete |
+| EXEC-06 | Phase 3 | Complete |
+| EXEC-07 | Phase 3 | Complete |
 | DASH-01 | Phase 4 | Pending |
 | DASH-02 | Phase 4 | Pending |
 | DASH-03 | Phase 4 | Pending |
