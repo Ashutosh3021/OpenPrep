@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect, KeyboardEvent } from 'react'
+import { useState, useEffect, useCallback, KeyboardEvent } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { mockProblems } from '@/lib/mock-data'
 import { CodeEditor } from '@/components/code-editor'
 import { CodeOutput } from '@/components/code-output'
+import { SubmissionPanel } from '@/components/submission-panel'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
 import { TestCaseList } from '@/components/test-case-list'
 import { ThumbsUp, Share2, Flag, Play, Loader2 } from 'lucide-react'
-import type { Language, ExecuteResponse } from '@/types'
+import type { Language, ExecuteResponse, SubmitResponse } from '@/types'
 
 interface ProblemDetailProps {
   problemId: number
@@ -53,6 +54,11 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
   const [customInput, setCustomInput] = useState('')
   const [output, setOutput] = useState<ExecuteResponse | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  
+  // Submission state
+  const [submissionResults, setSubmissionResults] = useState<SubmitResponse | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSubmissionPanel, setShowSubmissionPanel] = useState(false)
 
   if (!problem) {
     return (
@@ -113,13 +119,96 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
     }
   }
 
-  // Handle keyboard shortcut (Ctrl+Enter / Cmd+Enter)
+  // Handle keyboard shortcut (Ctrl+Enter / Cmd+Enter for Run)
+  // Handle keyboard shortcut (Ctrl+Shift+Enter / Cmd+Shift+Enter for Submit)
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    // Submit: Ctrl+Shift+Enter or Cmd+Shift+Enter
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmitCode()
+    }
+    // Run: Ctrl+Enter or Cmd+Enter
+    else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleRunCode()
     }
+    // Close submission panel on Escape
+    if (e.key === 'Escape' && showSubmissionPanel) {
+      setShowSubmissionPanel(false)
+    }
   }
+
+  // Handle Submit Code button click
+  const handleSubmitCode = async () => {
+    if (!code.trim()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmissionResults(null)
+    setShowSubmissionPanel(true)
+
+    try {
+      // Convert mock test cases to the format expected by the API
+      const testCasesForApi = mockTestCases.map(tc => ({
+        input: tc.input,
+        expectedOutput: tc.output
+      }))
+
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source: code,
+          language: selectedLanguage,
+          problemId: problemId,
+          testCases: testCasesForApi,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit code')
+      }
+
+      const data: SubmitResponse = await response.json()
+      setSubmissionResults(data)
+    } catch (error) {
+      console.error('Error submitting code:', error)
+      setSubmissionResults({
+        status: { id: 6, description: 'Runtime Error' },
+        time: '0.00',
+        memory: 0,
+        testResults: [],
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Handle closing submission panel
+  const handleCloseSubmissionPanel = useCallback(() => {
+    setShowSubmissionPanel(false)
+  }, [])
+
+  // Close submission panel on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showSubmissionPanel) {
+        setShowSubmissionPanel(false)
+      }
+    }
+
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape' && showSubmissionPanel) {
+        setShowSubmissionPanel(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalKeyDown)
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown)
+  }, [showSubmissionPanel])
 
   return (
     <div className="h-screen flex flex-col">
@@ -237,15 +326,23 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
           <div className="border-t border-border bg-card/50 p-4 flex gap-2">
             <Button 
               className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
-              disabled={isRunning}
+              onClick={handleSubmitCode}
+              disabled={isSubmitting || isRunning || !code.trim()}
             >
-              Submit
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit'
+              )}
             </Button>
             <Button 
               variant="outline" 
               className="border-border text-foreground hover:bg-card"
               onClick={handleRunCode}
-              disabled={isRunning || !code.trim()}
+              disabled={isRunning || isSubmitting || !code.trim()}
             >
               {isRunning ? (
                 <>
@@ -274,6 +371,14 @@ export function ProblemDetail({ problemId }: ProblemDetailProps) {
           )}
         </div>
       </div>
+
+      {/* Submission Results Panel */}
+      <SubmissionPanel
+        isOpen={showSubmissionPanel}
+        onClose={handleCloseSubmissionPanel}
+        submissionResults={submissionResults}
+        isSubmitting={isSubmitting}
+      />
     </div>
   )
 }
