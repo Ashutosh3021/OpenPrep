@@ -88,9 +88,9 @@
 
 **Plans:** 3 plans
 
-- [ ] 03-01-PLAN.md — Backend API integration with Judge0
-- [ ] 03-02-PLAN.md — Run Code functionality with custom input and output panel
-- [ ] 03-03-PLAN.md — Submit Code functionality with side panel results
+- [x] 03-01-PLAN.md — Backend API integration with Judge0
+- [x] 03-02-PLAN.md — Run Code functionality with custom input and output panel
+- [x] 03-03-PLAN.md — Submit Code functionality with side panel results
 
 ---
 
